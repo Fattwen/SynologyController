@@ -51,7 +51,7 @@ namespace synologyAPI
             _ErrorCodeMapping.Add(414, "File already exists");
             _ErrorCodeMapping.Add(415, "Disk quota exceeded");
             _ErrorCodeMapping.Add(416, "No space left on device");
-            _ErrorCodeMapping.Add(417, "Input/output error");
+            _ErrorCodeMapping.Add(417, @"Input/output error");
             _ErrorCodeMapping.Add(418, "Illegal name or path");
             _ErrorCodeMapping.Add(419, "Illegal file name");
             _ErrorCodeMapping.Add(420, "Illegal file name on FAT file system");
@@ -60,18 +60,18 @@ namespace synologyAPI
             _ErrorCodeMapping.Add(800, "A folder path of favorite folder is already added to user’s favorites.");
             _ErrorCodeMapping.Add(801, "A name of favorite folder conflicts with an existing folder path in the user’s favorites.");
             _ErrorCodeMapping.Add(802, "There are too many favorites to be added.");
-            _ErrorCodeMapping.Add(900, "Failed to delete file(s)/folder(s). More information in <errors> object.");
-            _ErrorCodeMapping.Add(1000, "Failed to copy files/folders. More information in <errors> object.");
-            _ErrorCodeMapping.Add(1001, "Failed to move files/folders. More information in <errors> object.");
+            _ErrorCodeMapping.Add(900, @"Failed to delete file(s)/folder(s). More information in <errors> object.");
+            _ErrorCodeMapping.Add(1000, @"Failed to copy files/folders. More information in <errors> object.");
+            _ErrorCodeMapping.Add(1001, @"Failed to move files/folders. More information in <errors> object.");
             _ErrorCodeMapping.Add(1002, "An error occurred at the destination. More information in <errors> object.");
             _ErrorCodeMapping.Add(1003, "Cannot overwrite or skip the existing file because no overwrite parameter is given.");
             _ErrorCodeMapping.Add(1004, "File cannot overwrite a folder with the same name, or folder cannot overwrite a file with the same name.");
-            _ErrorCodeMapping.Add(1006, "Cannot copy/move file/folder with special characters to a FAT32 file system.");
-            _ErrorCodeMapping.Add(1007, "Cannot copy/move a file bigger than 4G to a FAT32 file system.");
+            _ErrorCodeMapping.Add(1006, @"Cannot copy/move file/folder with special characters to a FAT32 file system.");
+            _ErrorCodeMapping.Add(1007, @"Cannot copy/move a file bigger than 4G to a FAT32 file system.");
             _ErrorCodeMapping.Add(1100, "Failed to create a folder. More information in <errors> object.");
             _ErrorCodeMapping.Add(1101, "The number of folders to the parent folder would exceed the system limitation.");
             _ErrorCodeMapping.Add(1200, "Failed to rename it. More information in <errors> object.");
-            _ErrorCodeMapping.Add(1300, "Failed to compress files/folders.");
+            _ErrorCodeMapping.Add(1300, @"Failed to compress files/folders.");
             _ErrorCodeMapping.Add(1301, "Cannot create the archive because the given archive name is too long.");
             _ErrorCodeMapping.Add(1400, "Failed to extract files.");
             _ErrorCodeMapping.Add(1401, "Cannot open the file as archive.");
@@ -136,8 +136,8 @@ namespace synologyAPI
             else 
             {
                 _login_error = true;
-                _login_error_msg = Mapping(json.error.code.Value<int>());
-                return Mapping(json.error.code.Value<int>());
+                _login_error_msg = Mapping((int)json.error.code);
+                return "[Error] : " + Mapping((int)json.error.code);
             }
         }
 
@@ -182,7 +182,7 @@ namespace synologyAPI
             }
         }
 
-        //upload local file By Restsharp
+        //upload local file
         public string UploadFile(string dest_path,string file,bool create_parents=false)
         {
             if (_login_error)
@@ -201,7 +201,7 @@ namespace synologyAPI
             {
                 IRestResponse response = client.Execute(request);
                 dynamic json = JsonConvert.DeserializeObject<dynamic>(response.Content);
-                string report = (bool)json.success ? json.success.ToString() : Mapping(json.error.code.Value<int>());
+                string report = (bool)json.success ? json.success.ToString() : Mapping((int)json.error.code);
                 return report;
             }
             catch (Exception excp)
@@ -210,7 +210,7 @@ namespace synologyAPI
             }
         }
 
-        //move filestation's file By Restsharp
+        //move
         public string MoveFile(string file,string dest_path,bool overwrite=false) 
         {
             if (_login_error)
@@ -230,7 +230,7 @@ namespace synologyAPI
             return report;
         }
 
-        //copy filestation's file By Restsharp
+        //copy
         public string CopyFile(string file, string dest_path, bool overwrite=false) 
         {
             if (_login_error)
@@ -251,7 +251,7 @@ namespace synologyAPI
             return report;
         }
 
-        //rename file's name
+        //rename
         public string RenameFile(string path,string name)
         {
             if (_login_error)
@@ -271,10 +271,12 @@ namespace synologyAPI
             return report;
         }
 
+        //remove
         public string RemoveFile()
         {
             return "not set yet";
         }
+
         //logout and release session id
         public bool Logout() 
         {
